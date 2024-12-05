@@ -3,7 +3,7 @@ Program:
 ;
 
 Statement:
-  PrintStatement |Initialization | Assignment| ArrayDeclaration | BooleanLiteral | IfStatement | ForLoop | WhileLoop
+  PrintStatement |Initialization | Assignment| ArrayDeclaration BooleanLiteral | IfStatement | ForLoop | WhileLoop
 ;
 
 PrintStatement:
@@ -20,6 +20,10 @@ Initialization:
 
 Assignment:
   varName=ID '=' value=Expression
+;
+
+ArrayDeclaration:
+  'let' varName=ID '=' '[' elements*=Expression (',' elements*=Expression)* ']'
 ;
 
 IfStatement:

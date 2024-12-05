@@ -74,6 +74,18 @@ class Lumen:
         elif isinstance(value, str):  # Handle variable or expression assignment
             self.varmap[var_name] = self.evaluate_expression(value)
 
+    def handle_array_declaration(self, command):
+        array_name = command.varName
+        elements = command.elements
+        if array_name in self.varmap:
+            raise Exception("Variable already defined")
+        self.varmap[array_name] = [self.evaluate_expression(x) for x in elements]
+
+    # def handle_array_assignment(self, command):
+
+    # def handle_array_access(self, command):
+
+
     def handle_if(self, command):
         condition = command.condition
         if self.evaluate_condition(condition):
@@ -138,3 +150,11 @@ class Lumen:
 # Interpret the program
 lumen = Lumen()
 lumen.interpret(lumen_model)
+
+# ArrayAccess:
+#   varName=ID '[' index=Expression ']'
+# ;
+
+# FunctionCall:
+#   'CPU.' methodName=ID '(' ')'
+# ;
