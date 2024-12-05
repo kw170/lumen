@@ -31,6 +31,8 @@ class Lumen:
                 self.handle_for(c)
             elif c.__class__.__name__ == "ArrayDeclaration":
                 self.handle_array_declaration(c)
+            elif c.__class__.__name__ == "ArrayAssignment":
+                self.handle_array_assignment(c)
             elif c.__class__.__name__ == "ArrayAccess":
                 self.handle_array_access(c)
 
@@ -81,7 +83,14 @@ class Lumen:
             raise Exception("Variable already defined")
         self.varmap[array_name] = [self.evaluate_expression(x) for x in elements]
 
-    # def handle_array_assignment(self, command):
+    def handle_array_assignment(self, command):
+        array_name = command.varName
+        elements = command.elements
+
+        if array_name in self.varmap:
+            self.varmap[array_name] = [self.evaluate_expression(x) for x in elements]
+        else:
+            raise Exception("Array is not defined")
 
     # def handle_array_access(self, command):
 
