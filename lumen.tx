@@ -3,7 +3,9 @@ Program:
 ;
 
 Statement:
-  PrintStatement |Initialization | Assignment| ArrayDeclaration | ArrayAssignment | BooleanLiteral | IfStatement | ForLoop | WhileLoop
+  PrintStatement |Initialization | VariableAssignment
+  | ArrayDeclaration | ArrayAssignment | ArrayElementAssignment
+  | BooleanLiteral | IfStatement | ForLoop | WhileLoop
 ;
 
 PrintStatement:
@@ -11,14 +13,14 @@ PrintStatement:
 ;
 
 PrintExpression:
-  STRING | BooleanLiteral | Expression | ID
+  Expression | BooleanLiteral | ID | STRING | ArrayAccess
 ;
 
 Initialization:
   'let' varName=ID '=' value=Expression
 ;
 
-Assignment:
+VariableAssignment:
   varName=ID '=' value=Expression
 ;
 
@@ -28,6 +30,14 @@ ArrayDeclaration:
 
 ArrayAssignment:
   varName=ID '=' '[' elements*=Expression (',' elements*=Expression)* ']'
+;
+
+ArrayElementAssignment:
+  varName=ID '[' index=Expression ']' '=' value=Expression
+;
+
+ArrayAccess:
+  varName=ID LBRACKET index=Expression RBRACKET
 ;
 
 IfStatement:
@@ -61,7 +71,7 @@ Term:
 ;
 
 Factor:
-  INT | ID | STRING | BooleanLiteral | '(' Expression ')'
+  INT | ID | STRING | BooleanLiteral | '(' Expression ')' | ArrayAccess
 ;
 
 Comparison:
@@ -86,4 +96,10 @@ INT:
 
 BooleanLiteral:
   'true' | 'false'
+;
+
+LBRACKET: '['
+;
+
+RBRACKET: ']'
 ;
