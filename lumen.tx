@@ -6,6 +6,8 @@ Statement:
   PrintStatement |Initialization | VariableAssignment
   | ArrayDeclaration | ArrayAssignment | ArrayElementAssignment
   | BooleanLiteral | IfStatement | ForLoop | WhileLoop
+  | 'NETWORK.live()'
+
 ;
 
 PrintStatement:
@@ -71,7 +73,18 @@ Term:
 ;
 
 Factor:
-  INT | ID | STRING | BooleanLiteral | '(' Expression ')' | ArrayAccess
+  LumenFunctionCall| INT | ID | STRING | BooleanLiteral | '(' Expression ')' | ArrayAccess
+;
+
+LumenFunctionCall:
+  system='CPU' '.' methodName=Function '(' ')'
+  | system='MEMORY' '.' methodName=Function '(' ')'
+  | system='NETWORK' '.' methodName=Function '(' ')'
+;
+
+Function:
+  'info' | 'name' | 'count' | 'phys_cores' | 'freq' | 'usage_per_core' | 'usage'
+  | 'total' | 'available' | 'sent' | 'recv'
 ;
 
 Comparison:
