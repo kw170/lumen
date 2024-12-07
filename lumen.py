@@ -181,7 +181,7 @@ class Lumen:
         elif system == "MEMORY":
             memory = psutil.virtual_memory()
             memory_info = {
-                "total": round(memory.total / (1024 ** 3), 2),  # Total memory in bytes
+                "total": round(memory.total / (1024 ** 3), 2),  # Total memory in gb
                 "available": round(memory.available / (1024 ** 3), 2),
                 "usage": memory.percent
             }
@@ -206,6 +206,27 @@ class Lumen:
                 raise Exception("Network method does not exist")
             else:
                 return network_info[methodName]
+
+        elif system == "GPU":
+            gpu_info = {
+                "name": [],
+                "usage": [],
+                "total": [],
+                "temp": []
+            }
+            gpu_stats = gpustat.new_query().gpus
+            for gpu in gpu_stats:
+                gpu_info['name'].append(gpu['name'])
+                gpu_info['usage'].append(gpu['utilization.gpu'])
+                gpu_info['total'].append(gpu['memory.total'] / 1024)
+                gpu_info['temp'].append(gpu['temperature.gpu'])
+
+            if methodName == "info":
+                return gpu_info
+            elif methodName not in gpu_info:
+                raise Exception("GPU method does not exist")
+            else:
+                return gpu_info[methodName]
 
     def evaluate_expression(self, expr):
         # Evaluate simple expressions, including arithmetic operations

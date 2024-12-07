@@ -80,11 +80,12 @@ LumenFunctionCall:
   system='CPU' '.' methodName=Function '(' ')'
   | system='MEMORY' '.' methodName=Function '(' ')'
   | system='NETWORK' '.' methodName=Function '(' ')'
+  | system='GPU' '.' methodName=Function '(' ')'
 ;
 
 Function:
   'info' | 'name' | 'count' | 'phys_cores' | 'freq' | 'usage_per_core' | 'usage'
-  | 'total' | 'available' | 'sent' | 'recv'
+  | 'total' | 'available' | 'sent' | 'recv' | 'temp'
 ;
 
 Comparison:
