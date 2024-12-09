@@ -199,10 +199,10 @@ class Lumen:
             elif methodName not in gpu_info:
                 raise Exception("GPU method does not exist")
             else:
-                if command.index:
+                if not command.index:
                     return gpu_info[methodName]
                 else:
-                    return gpu_info[methodName][command.index]
+                    return gpu_info[methodName][self.evaluate_expression(command.index)]
 
     def evaluate_expression(self, expr):
         evaluated_expr = self.evaluate_term(expr)
@@ -235,6 +235,9 @@ class Lumen:
         elif term.__class__.__name__ == "ArrayAccess":
             # Evaluate array access and return the value
             return self.handle_array_access(term)
+        elif term.__class__.__name__ == "ArrayLength":
+            var_name = term.varName
+            return len(self.varmap[var_name])
         elif term.__class__.__name__ == "LumenFunctionCall":
             return self.lumen_function_call(term)
         elif hasattr(term, 'left') and hasattr(term, 'op') and hasattr(term, 'right'):

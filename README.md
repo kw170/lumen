@@ -16,8 +16,11 @@ NETWORK.sent() # returns amount of data being sent on the network in MBs
 NETWORK.recv() # returns amound of data being received on the network MBs
 NETWORK.live() # runs program to display live upload and download speed
 
-GPU.info() returns array of GPU info
-GPU.name() returns array of GPUs' names
-GPU.usage() returns array of GPUs' memory usage percentage
-GPU.total() returns array of GPUs' total memory in GBs
-GPU.temp() returns array of GPUs' temperatures
+GPU.info(x) returns array of GPU info
+GPU.name(x) returns array of GPUs' names
+GPU.usage(x) returns array of GPUs' memory usage percentage
+GPU.total(x) returns array of GPUs' total memory in GBs
+GPU.temp(x) returns array of GPUs' temperatures
+x = index of GPU
+
+len(array) returns length of array

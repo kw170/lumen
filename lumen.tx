@@ -83,6 +83,7 @@ MulOp:
 Factor:
   LumenFunctionCall
   | ArrayAccess
+  | ArrayLength
   | INT
   | STRING
   | BooleanLiteral
@@ -93,6 +94,10 @@ Factor:
 LumenFunctionCall:
   system=Systems '.' methodName=Function '(' ')'
   | system=Systems '.' methodName=Function '(' index=Expression ')'
+;
+
+ArrayLength:
+  'len'  '(' varName=ID ')'
 ;
 
 Function:
@@ -135,5 +140,5 @@ RBRACKET: ']'
 ;
 
 Systems:
-  'CPU' | 'MEMORY' | 'NETWORK' | 'GPU'
+  'CPU' | 'MEMORY' | 'NETWORK' | 'GPU' | ID
 ;
