@@ -20,7 +20,6 @@ class Lumen:
             elif c.__class__.__name__ == "Initialization":
                 self.handle_initialization(c)
             elif c.__class__.__name__ == "VariableAssignment":
-                #print(f"DEBUG: VariableAssignment: varName={c.varName}, value={c.value}")
                 self.handle_variable_assignment(c)
             elif c.__class__.__name__ == "IfStatement":
                 self.handle_if(c)
@@ -42,28 +41,11 @@ class Lumen:
     def handle_print(self, command):
         # Print command, supporting variables, arrays, and expressions
         expr = command.expression
-        if isinstance(expr, str):
-            expr = self.evaluate_expression(expr)
-            print(expr)  # Direct string
-        elif isinstance(expr, int):
-            print(expr)  # Direct integer
-        elif isinstance(expr, str) and expr.startswith("["):  # Assuming array
-            arr = self.varmap.get(expr, [])
-            print(arr)
-        elif expr.__class__.__name__ == "ArrayAccess":
-            array_name = expr.varName
-            index = self.evaluate_expression(expr.index)
-            if array_name not in self.varmap:
-                raise Exception("Array not defined")
-            print(self.varmap[array_name][index])
-        elif expr.__class__.__name__ == "LumenFunctionCall":
-            print(self.lumen_function_call(expr))
-        else:  # Handle variables
-            print(self.varmap.get(expr, "Undefined"))
+        print(self.evaluate_expression(expr))
 
     def handle_initialization(self, command):
         var_name = command.varName
-        value = command.value
+        value = self.evaluate_expression(command.value)
         if var_name in self.varmap: # Raise Error if already initialized
             raise Exception("Variable is already defined")
         elif isinstance(value, int):
@@ -73,14 +55,6 @@ class Lumen:
                 self.varmap[var_name] = list(map(int, value[1:-1].split(",")))
             else:
                 self.varmap[var_name] = eval(value)
-        elif value.__class__.__name__ == "ArrayAccess":
-            if value.varName not in self.varmap:
-                raise Exception("Array not defined")
-            array_name = self.varmap[value.varName]
-            index = self.evaluate_expression.index
-            self.varmap[var_name] = array_name[index]
-        elif value.__class__.__name__ == "LumenFunctionCall":
-            self.varmap[var_name] = self.lumen_function_call(value)
 
     def handle_variable_assignment(self, command):
         var_name = command.varName
@@ -147,7 +121,6 @@ class Lumen:
         condition = command.condition
         while self.evaluate_condition(condition):
             self.interpret(command)
-
 
     def handle_for(self, command):
         loopVar = command.loopVar
@@ -226,30 +199,59 @@ class Lumen:
             elif methodName not in gpu_info:
                 raise Exception("GPU method does not exist")
             else:
-                return gpu_info[methodName]
+                if command.index:
+                    return gpu_info[methodName]
+                else:
+                    return gpu_info[methodName][command.index]
 
     def evaluate_expression(self, expr):
-        # Evaluate simple expressions, including arithmetic operations
-        if isinstance(expr, int):
-            return expr
-        elif isinstance(expr, str):
-            # Handle arithmetic expressions
-            if any(op in expr for op in "+-*/%"):
-                try:
-                    # Safely evaluate the arithmetic expression
-                    return eval(expr, {"__builtins__": None}, self.varmap)
-                except Exception as e:
-                    raise Exception(f"Error evaluating expression '{expr}': {e}")
-            elif expr.startswith("["):
-                # Handle array expressions
-                return self.varmap.get(expr, [])
-            else:
-                # Handle variable lookups
-                return self.varmap.get(expr, None)                 #come back to this
-        return 0
+        evaluated_expr = self.evaluate_term(expr)
+        try:
+            # Safely evaluate the resulting expression
+            return eval(evaluated_expr, {"__builtins__": None}, self.varmap)
+        except Exception as e:
+            raise ValueError(f"Error evaluating expression '{evaluated_expr}': {e}")
 
     def evaluate_condition(self, condition):
         # Evaluate conditions in If, While, and For statements
+        left = self.evaluate_expression(condition.left)
+        right = self.evaluate_expression(condition.right)
+
+        if condition.logOp:
+            if condition.logOp == "&&":
+                return self.evaluate_condition(left) and self.evaluate_condition(right)
+            elif condtion.logOp == "||":
+                return self.evaluate_condition(left) or self.evaluate_condition(right)
+        return self.evaluate_operation(condition)
+
+    def evaluate_term(self, term):
+        if isinstance(term, int):
+            return term
+        elif isinstance(term, str):
+            if term in self.varmap:
+                return str(self.varmap[term])
+            else:
+                raise ValueError(f"Undefined variable '{term}' encountered in term.")
+        elif term.__class__.__name__ == "ArrayAccess":
+            # Evaluate array access and return the value
+            return self.handle_array_access(term)
+        elif term.__class__.__name__ == "LumenFunctionCall":
+            return self.lumen_function_call(term)
+        elif hasattr(term, 'left') and hasattr(term, 'op') and hasattr(term, 'right'):
+            # Build the expression string recursively
+            left_value = self.evaluate_term(term.left)
+            right_values = [self.evaluate_term(r) for r in term.right]
+            operators = term.op
+
+            # Combine left value, operators, and right values
+            expression = str(left_value)
+            for op, rv in zip(operators, right_values):
+                expression += f" {op} {rv}"
+            return expression
+        else:
+            return term
+
+    def evaluate_operation(self, condition):
         left = self.evaluate_expression(condition.left)
         right = self.evaluate_expression(condition.right)
         if condition.comp == "==":

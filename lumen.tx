@@ -7,7 +7,6 @@ Statement:
   | ArrayDeclaration | ArrayAssignment | ArrayElementAssignment
   | BooleanLiteral | IfStatement | ForLoop | WhileLoop
   | 'NETWORK.live()'
-
 ;
 
 PrintStatement:
@@ -15,7 +14,7 @@ PrintStatement:
 ;
 
 PrintExpression:
-  Expression | BooleanLiteral | ID | STRING | ArrayAccess
+  Expression | BooleanLiteral | ID | STRING
 ;
 
 Initialization:
@@ -39,7 +38,7 @@ ArrayElementAssignment:
 ;
 
 ArrayAccess:
-  varName=ID LBRACKET index=Expression RBRACKET
+  varName=ID '[' index=Expression ']'
 ;
 
 IfStatement:
@@ -62,25 +61,38 @@ ForLoop:
 
 Condition:
   left=Expression comp=Comparison right=Expression
+  | left=Condition logOp=LogicalOp right=Condition
 ;
 
 Expression:
-  Term (('+' | '-') Term)*
+  left=Term (op=AddOp right=Term)*
+;
+
+AddOp:
+  '+' | '-'
 ;
 
 Term:
-  Factor (('*' | '/' | '%') Factor)*
+    left=Factor (op=MulOp right=Factor)*
+;
+
+MulOp:
+    '*' | '/' | '%'
 ;
 
 Factor:
-  LumenFunctionCall| INT | ID | STRING | BooleanLiteral | '(' Expression ')' | ArrayAccess
+  LumenFunctionCall
+  | ArrayAccess
+  | INT
+  | STRING
+  | BooleanLiteral
+  | '(' Expression ')'
+  | ID
 ;
 
 LumenFunctionCall:
-  system='CPU' '.' methodName=Function '(' ')'
-  | system='MEMORY' '.' methodName=Function '(' ')'
-  | system='NETWORK' '.' methodName=Function '(' ')'
-  | system='GPU' '.' methodName=Function '(' ')'
+  system=Systems '.' methodName=Function '(' ')'
+  | system=Systems '.' methodName=Function '(' index=Expression ')'
 ;
 
 Function:
@@ -90,6 +102,10 @@ Function:
 
 Comparison:
   '>' | '<' | '>=' | '<=' | '==' | '!='
+;
+
+LogicalOp:
+  '&&' | '||'
 ;
 
 Comment:
@@ -116,4 +132,8 @@ LBRACKET: '['
 ;
 
 RBRACKET: ']'
+;
+
+Systems:
+  'CPU' | 'MEMORY' | 'NETWORK' | 'GPU'
 ;
