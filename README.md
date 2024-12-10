@@ -39,7 +39,7 @@ Lumen is ideal for:
 - `pip install gpustat`
 4. Edit program.lmn
 5. Run interpreter
-- `python luemn.py`
+- `python lumen.py`
 
 ---
 
