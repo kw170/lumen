@@ -23,4 +23,6 @@ GPU.total(x) returns array of GPUs' total memory in GBs
 GPU.temp(x) returns array of GPUs' temperatures
 x = index of GPU
 
-len(array) returns length of array
+len(array) # returns length of array
+
+array.ecoSort() # sorts array with method based on the size of the array

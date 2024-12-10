@@ -3,7 +3,7 @@ Program:
 ;
 
 Statement:
-  PrintStatement |Initialization | VariableAssignment
+  EcoSortMethod | PrintStatement |Initialization | VariableAssignment
   | ArrayDeclaration | ArrayAssignment | ArrayElementAssignment
   | BooleanLiteral | IfStatement | ForLoop | WhileLoop
   | 'NETWORK.live()'
@@ -96,13 +96,17 @@ LumenFunctionCall:
   | system=Systems '.' methodName=Function '(' index=Expression ')'
 ;
 
+EcoSortMethod:
+  arrayName=ID '.' methodName=Function '(' ')'
+;
+
 ArrayLength:
   'len'  '(' varName=ID ')'
 ;
 
 Function:
   'info' | 'name' | 'count' | 'phys_cores' | 'freq' | 'usage_per_core' | 'usage'
-  | 'total' | 'available' | 'sent' | 'recv' | 'temp'
+  | 'total' | 'available' | 'sent' | 'recv' | 'temp' | 'ecoSort'
 ;
 
 Comparison:

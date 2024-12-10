@@ -14,6 +14,7 @@ class Lumen:
 
     def interpret(self, model):
         for c in model.statements:
+            print(c)
             # Handle different types of statements
             if c.__class__.__name__ == "PrintStatement":
                 self.handle_print(c)
@@ -37,6 +38,8 @@ class Lumen:
                 self.handle_array_assignment(c)
             elif c == "NETWORK.live()":
                 self.handle_network_usage()
+            elif c.__class__.__name__ == "EcoSortMethod":
+                self.handle_sort_method(c)
 
     def handle_print(self, command):
         # Print command, supporting variables, arrays, and expressions
@@ -58,15 +61,13 @@ class Lumen:
 
     def handle_variable_assignment(self, command):
         var_name = command.varName
-        value = command.value
-
+        value = self.evaluate_expression(command.value)
+        print(value)
         if var_name not in self.varmap:
             raise Exception("Variable is not defined")
 
         if isinstance(value, int):
             self.varmap[var_name] = value
-        elif isinstance(value, str):
-            self.varmap[var_name] = self.evaluate_expression(value)
         elif value.__class__.__name__ == "LumenFunctionCall":
             self.varmap[var_name] = self.lumen_function_call(value)
 
@@ -317,6 +318,69 @@ class Lumen:
 
         except KeyboardInterrupt:
             print("\nTracking stopped.")
+
+    def handle_sort_method(self, c):
+        array_name = c.arrayName
+        array_value = self.varmap[array_name]
+        if len(array_value) < 100:
+            self.varmap[array_name] = self.insertion_sort(array_value)
+        else:
+            self.varmap[array_name] = self.merge_sort(array_value)
+
+    def insertion_sort(self, array):
+        for i in range(1, len(array)):
+            key = array[i]
+            j = i - 1
+
+            # Binary search for position
+            low, high = 0, j
+            while low <= high:
+                mid = (low + high) // 2
+                if array[mid] > key:
+                    high = mid - 1
+                else:
+                    low = mid + 1
+
+            # Shift elements and insert
+            while j >= low:
+                array[j + 1] = array[j]
+                j -= 1
+            array[j + 1] = key
+        return array
+
+    def merge_sort(self, array):
+        if len(array) > 1:
+            mid = len(array) // 2
+            left = array[:mid]
+            right = array[mid:]
+
+            self.merge_sort(left)
+            self.merge_sort(right)
+
+            self.merge(left, right, array)
+        return array
+
+    def merge(self, left, right, array):
+        i = j = k = 0
+
+        while i < len(left) and j < len(right):
+            if left[i] <= right[j]:
+                array[k] = left[i]
+                i += 1
+            else:
+                array[k] = right[j]
+                j += 1
+            k += 1
+
+        while i < len(left):
+            array[k] = left[i]
+            i += 1
+            k += 1
+
+        while j < len(right):
+            array[k] = right[j]
+            j += 1
+            k += 1
 
 
 
