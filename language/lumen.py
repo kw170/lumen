@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 # Load the model from the grammar and input program
 lumen_mm = metamodel_from_file('lumen.tx')
-lumen_model = lumen_mm.model_from_file('program.lmn')
+lumen_model = lumen_mm.model_from_file('./example_programs/program1.lmn')
 
 class Lumen:
     def __init__(self):
@@ -21,7 +21,6 @@ class Lumen:
 
     def interpret(self, model):
         for c in model.statements:
-            print(c.__class__.__name__)
             # Handle different types of statements
             if c.__class__.__name__ == "PrintStatement":
                 self.handle_print(c)
@@ -170,7 +169,7 @@ class Lumen:
 
     def handle_parallel(self, command):
         urls = command.urls
-        with ThreadPoolExecutor(max_workers=5) as executor:  # Adjust `max_workers` for concurrency
+        with ThreadPoolExecutor(max_workers=5) as executor:
             results = executor.map(self.download_file, urls)
 
         for result in results:
@@ -384,7 +383,7 @@ class Lumen:
 
                 # Print results
                 print(
-                    f"{time.strftime('%H:%M:%S'):>15} "
+                    f"{time.strftime('%H:%M:%S'):<15} "
                     f"{self.format_bytes(upload_speed):<20} "
                     f"{self.format_bytes(download_speed):<20}"
                 )
