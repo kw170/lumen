@@ -1,0 +1,3 @@
+let array = [5, 4, 3, 2, 1]
+array.ecoSort()
+print(array)

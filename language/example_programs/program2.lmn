@@ -1,0 +1,9 @@
+print(CPU.info())
+
+let x = CPU.usage()
+while (x < 15){
+  print("Low CPU usage")
+  x = CPU.usage()
+}
+
+print(“HIGH CPU USAGE”)

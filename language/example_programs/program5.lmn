@@ -1,0 +1,5 @@
+parallel{
+  "https://www.sample-videos.com/text/Sample-text-file-10kb.txt",
+  "https://www.sample-videos.com/text/Sample-text-file-20kb.txt",
+  "https://baconipsum.com/api/?type=all-meat&paras=2&format=text"
+}
