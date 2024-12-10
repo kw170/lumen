@@ -38,8 +38,8 @@ Lumen is ideal for:
 - `pip install psutil`
 - `pip install gpustat`
 4. Edit program.lmn
-5. Run program.lmn
-- `python program.lmn`
+5. Run interpreter
+- `python luemn.py`
 
 ---
 
