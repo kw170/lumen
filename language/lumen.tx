@@ -3,7 +3,7 @@ Program:
 ;
 
 Statement:
-  EcoSortMethod | PrintStatement |Initialization | VariableAssignment
+  Quit | EcoSortMethod | PrintStatement |Initialization | VariableAssignment
   | ArrayDeclaration | ArrayAssignment | ArrayElementAssignment
   | BooleanLiteral | IfStatement | ForLoop | WhileLoop
   | 'NETWORK.live()'
@@ -54,7 +54,7 @@ WhileLoop:
 ;
 
 ForLoop:
-  'for' '(' loopVar=ID 'in' 'range' '(' rangeStart=INT ',' rangeEnd=INT ')' ')' '{'
+  'for' '(' loopVar=ID 'in' 'range' '(' rangeStart=NUMBER ',' rangeEnd=NUMBER ')' ')' '{'
     statements*=Statement
   '}'
 ;
@@ -81,14 +81,14 @@ MulOp:
 ;
 
 Factor:
-  LumenFunctionCall
-  | ArrayAccess
-  | ArrayLength
-  | INT
-  | STRING
-  | BooleanLiteral
-  | '(' Expression ')'
-  | ID
+  var=LumenFunctionCall
+  | var=ArrayAccess
+  | var=ArrayLength
+  | var=NUMBER
+  | string=STRING
+  | var=BooleanLiteral
+  | var='(' Expression ')'
+  | var=ID
 ;
 
 LumenFunctionCall:
@@ -129,19 +129,26 @@ ID:
   /[a-zA-Z_][a-zA-Z0-9_]*/
 ;
 
+NUMBER:
+  FLOAT | INT
+;
+
 INT:
   /[0-9]+/
+;
+
+FLOAT:
+  /-?\d+\.\d+/
 ;
 
 BooleanLiteral:
   'true' | 'false'
 ;
 
-LBRACKET: '['
+Quit:
+  'QUIT'
 ;
 
-RBRACKET: ']'
-;
 
 Systems:
   'CPU' | 'MEMORY' | 'NETWORK' | 'GPU' | ID

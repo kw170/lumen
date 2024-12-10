@@ -1,3 +1,4 @@
+import sys
 from textx import metamodel_from_file
 import psutil
 import gpustat
@@ -14,7 +15,6 @@ class Lumen:
 
     def interpret(self, model):
         for c in model.statements:
-            print(c)
             # Handle different types of statements
             if c.__class__.__name__ == "PrintStatement":
                 self.handle_print(c)
@@ -40,33 +40,43 @@ class Lumen:
                 self.handle_network_usage()
             elif c.__class__.__name__ == "EcoSortMethod":
                 self.handle_sort_method(c)
+            elif c == "QUIT":
+                self.handle_quit(c)
 
     def handle_print(self, command):
         # Print command, supporting variables, arrays, and expressions
         expr = command.expression
-        print(self.evaluate_expression(expr))
+        if expr.left.left.string != "":
+            print(expr.left.left.string)
+        else:
+            print(self.evaluate_expression(expr))
 
     def handle_initialization(self, command):
         var_name = command.varName
-        value = self.evaluate_expression(command.value)
+        value = ""
+        checkForString = command.value.left.left.string
+
+        if checkForString != "":
+            value = checkForString
+        else:
+            value = self.evaluate_expression(command.value)
         if var_name in self.varmap: # Raise Error if already initialized
             raise Exception("Variable is already defined")
-        elif isinstance(value, int):
+        elif isinstance(value, int) or isinstance(value, float):
             self.varmap[var_name] = value
         elif isinstance(value, str):
             if value.startswith("["):
                 self.varmap[var_name] = list(map(int, value[1:-1].split(",")))
             else:
-                self.varmap[var_name] = eval(value)
+                self.varmap[var_name] = value
 
     def handle_variable_assignment(self, command):
         var_name = command.varName
         value = self.evaluate_expression(command.value)
-        print(value)
         if var_name not in self.varmap:
             raise Exception("Variable is not defined")
 
-        if isinstance(value, int):
+        if isinstance(value, int) or isinstance(value, float):
             self.varmap[var_name] = value
         elif value.__class__.__name__ == "LumenFunctionCall":
             self.varmap[var_name] = self.lumen_function_call(value)
@@ -131,6 +141,9 @@ class Lumen:
         for i in range(range_start, range_end):
             self.varmap[loopVar] = i
             self.interpret(command)
+
+    def handle_quit(self, command):
+        sys.exit()
 
     def lumen_function_call(self, command):
         system = command.system
@@ -226,11 +239,17 @@ class Lumen:
         return self.evaluate_operation(condition)
 
     def evaluate_term(self, term):
+        if hasattr(term, 'var'):
+            term = term.var
         if isinstance(term, int):
             return term
         elif isinstance(term, str):
             if term in self.varmap:
-                return str(self.varmap[term])
+                try:
+                    int(self.varmap[term])
+                    return str(self.varmap[term])
+                except:
+                    return (f'"{self.varmap[term]}"')
             else:
                 raise ValueError(f"Undefined variable '{term}' encountered in term.")
         elif term.__class__.__name__ == "ArrayAccess":
@@ -250,6 +269,7 @@ class Lumen:
             # Combine left value, operators, and right values
             expression = str(left_value)
             for op, rv in zip(operators, right_values):
+                rv = str(rv)
                 expression += f" {op} {rv}"
             return expression
         else:
