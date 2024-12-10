@@ -1,14 +1,15 @@
 import sys
+import time
+import platform
+import os
+import re
+
+import requests
 from textx import metamodel_from_file
 import psutil
 import gpustat
 from gpustat import GPUStatCollection
-import time
-import platform
-import requests
-import re
 from concurrent.futures import ThreadPoolExecutor
-import os
 
 # Load the model from the grammar and input program
 lumen_mm = metamodel_from_file('lumen.tx')
