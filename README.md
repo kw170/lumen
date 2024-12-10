@@ -1,4 +1,4 @@
-# **Lumen: A Sustainability-Focused Programming Language**
+# **Lumen: Sustainability in code**
 
 Lumen is a programming language designed to help developers write energy-efficient and eco-friendly code, promoting sustainability, resource optimization, and environmental impact reduction.
 
