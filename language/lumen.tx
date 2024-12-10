@@ -3,7 +3,7 @@ Program:
 ;
 
 Statement:
-  Quit | EcoSortMethod | PrintStatement |Initialization | VariableAssignment
+  Quit | PlotUsage | EcoSortMethod | Parallel | PrintStatement |Initialization | VariableAssignment
   | ArrayDeclaration | ArrayAssignment | ArrayElementAssignment
   | BooleanLiteral | IfStatement | ForLoop | WhileLoop
   | 'NETWORK.live()'
@@ -145,10 +145,20 @@ BooleanLiteral:
   'true' | 'false'
 ;
 
+Parallel:
+  'parallel' '{'
+    urls*=STRING (',' urls=STRING)*
+  '}'
+;
+
+
 Quit:
   'QUIT'
 ;
 
+PlotUsage:
+  'plotUsage()'
+;
 
 Systems:
   'CPU' | 'MEMORY' | 'NETWORK' | 'GPU' | ID

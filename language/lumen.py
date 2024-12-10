@@ -2,8 +2,13 @@ import sys
 from textx import metamodel_from_file
 import psutil
 import gpustat
+from gpustat import GPUStatCollection
 import time
 import platform
+import requests
+import re
+from concurrent.futures import ThreadPoolExecutor
+import os
 
 # Load the model from the grammar and input program
 lumen_mm = metamodel_from_file('lumen.tx')
@@ -15,6 +20,7 @@ class Lumen:
 
     def interpret(self, model):
         for c in model.statements:
+            print(c.__class__.__name__)
             # Handle different types of statements
             if c.__class__.__name__ == "PrintStatement":
                 self.handle_print(c)
@@ -42,6 +48,10 @@ class Lumen:
                 self.handle_sort_method(c)
             elif c == "QUIT":
                 self.handle_quit(c)
+            elif c == "plotUsage()":
+                self.handle_plot(c)
+            elif c.__class__.__name__ == "Parallel":
+                self.handle_parallel(c)
 
     def handle_print(self, command):
         # Print command, supporting variables, arrays, and expressions
@@ -144,6 +154,48 @@ class Lumen:
 
     def handle_quit(self, command):
         sys.exit()
+
+    def handle_plot(self, command):
+
+        gpus = GPUStatCollection.new_query().gpus
+        gpu_usage = gpus[0].utilization
+
+        data = [psutil.cpu_percent(interval=1), gpu_usage, psutil.virtual_memory().percent]
+        labels = ["CPU", "GPU", "Memory"]
+
+        for label, value in zip(labels, data):
+            bar = "█" * int(value / 5) + "-" * (20 - int(value / 5))
+            print(f"{label} Usage:\n[{bar}] {value}%")
+
+    def handle_parallel(self, command):
+        urls = command.urls
+        with ThreadPoolExecutor(max_workers=5) as executor:  # Adjust `max_workers` for concurrency
+            results = executor.map(self.download_file, urls)
+
+        for result in results:
+            print(result)
+
+    def sanitize_file_name(self, url):
+        file_name = url.split("/")[-1]
+        return re.sub(r'[<>:"/\\|?*]', '_', file_name)
+
+    # Function to download a single file
+    def download_file(self, url):
+        file_name = self.sanitize_file_name(url)
+
+        download_folder = "downloads"
+        os.makedirs(download_folder, exist_ok=True)
+
+        file_path = os.path.join(download_folder, file_name)
+
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            with open(file_path, "wb") as file:
+                file.write(response.content)
+            return f"{file_name} downloaded successfully to {file_path}."
+        except Exception as e:
+            return f"Failed to download {url}: {e}"
 
     def lumen_function_call(self, command):
         system = command.system
